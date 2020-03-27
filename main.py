@@ -5,6 +5,7 @@ import time
 import random
 import MySQLdb
 import os
+import csv
 
 path = './jobs/'
 if not os.path.exists(path):
@@ -29,25 +30,10 @@ vacancy_urls = []
 # Require Skills
 skills = []
 
-# Salary
-salarys = []
-
-# Job Description
-job_descriptions = []
-
-# Company Name
-company_names = []
-
-# Company Page
-company_pages = []
-
-# Address
-addresses = []
-
 # The variable of work-context dictionary
 work_dict_urls = []
 
-for page in range(1, 6):
+for page in range(1, 31):
     url = 'https://www.104.com.tw/jobs/search/?ro=0&keyword=' \
           + keyword + '&order=15&asc=0&page=' + str(page) + '&mode=s'
 
@@ -86,25 +72,7 @@ for page in range(1, 6):
         company_page = job_content['data']['header']['custUrl']
         address = job_content['data']['jobDetail']['addressRegion'] + job_content['data']['jobDetail']['addressDetail']
 
-        # salarys.append(job_content['data']['jobDetail']['salary'])
-        #
-        # job_descriptions.append(job_content['data']['jobDetail']['jobDescription'])
-        #
-        # company_names.append(job_content['data']['header']['custName'])
-        #
-        # company_pages.append(job_content['data']['header']['custUrl'])
-        #
-        # addresses.append(job_content['data']['jobDetail']['addressRegion']
-        #                  + job_content['data']['jobDetail']['addressDetail'])
-
-        print(job_name)
-        print(salary)
-        print(job_description)
-        print(company_name)
-        print(company_page)
-        print(address)
-        print(skills_list)
-        print('-------------------------------------------------------------------')
+        print('Done')
 
         file_content = ''
 
@@ -119,11 +87,11 @@ for page in range(1, 6):
             file_content += skill + ','
 
         try:
-            with open(path + company_name + '-' + job_name, 'w', encoding='utf-8') as f:
+            with open(path + company_name + '-' + job_name + '.txt', 'w', encoding='utf-8') as f:
                 f.write(file_content)
         except Exception as err:
             print(err.args)
 
-        time.sleep(random.randint(0, 2))
+    time.sleep(random.randint(0, 5))
 
     print('換頁換頁換頁換頁換頁換頁換頁換頁換頁換頁換頁換頁換頁換頁換頁換頁')
