@@ -4,7 +4,6 @@ import json
 import time
 import random
 import os
-import csv
 
 path = './jobs/'
 if not os.path.exists(path):
@@ -56,15 +55,15 @@ for page in range(1, 51):
         res = ss.get(work_dict_url, headers=headers)
         job_content = json.loads(res.text)
 
+        skills_list = []
+        job_name = ''
+        salary = ''
+        job_description = ''
+        company_name = ''
+        company_page = ''
+        address = ''
+        
         try:
-            skills_list = []
-            job_name = ''
-            salary = ''
-            job_description = ''
-            company_name = ''
-            company_page = ''
-            address = ''
-
             skill_dict = job_content['data']['condition']['specialty']
 
             # from skill dict get skills
