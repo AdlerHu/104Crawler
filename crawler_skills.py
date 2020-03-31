@@ -1,3 +1,5 @@
+# It seems that an error would occur if crawler too many page (???)
+
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -15,7 +17,6 @@ headers = {
 
 keyword = '資料庫'
 work_dict_head = 'https://www.104.com.tw/job/ajax/content/'
-
 
 ss = requests.session()
 
@@ -55,16 +56,24 @@ for page in range(1, 101):
         res = ss.get(work_dict_url, headers=headers)
         job_content = json.loads(res.text)
 
-        skill_dict = job_content['data']['condition']['specialty']
         skills_list = []
+        job_name = ''
+        company_name = ''
 
-        # from skill dict get skills
-        for skill in skill_dict:
-            skills_list.append(skill['description'])
-            skills.append(skills_list)
+        try:
+            skill_dict = job_content['data']['condition']['specialty']
 
-        job_name = job_content['data']['header']['jobName']
-        company_name = job_content['data']['header']['custName']
+            # from skill dict get skills
+            for skill in skill_dict:
+                skills_list.append(skill['description'])
+                skills.append(skills_list)
+
+            job_name = job_content['data']['header']['jobName']
+            company_name = job_content['data']['header']['custName']
+
+        except Exception as err:
+            print('line 75 {}'.format(err.args))
+            continue
 
         print('Done')
 
@@ -77,7 +86,7 @@ for page in range(1, 101):
             with open(skill_path + company_name + '-' + job_name + '.txt', 'w', encoding='utf-8') as f:
                 f.write(file_content)
         except Exception as err:
-            print(err.args)
+            print('line 88 {}'.format(err.args))
 
     time.sleep(random.randint(0, 5))
 

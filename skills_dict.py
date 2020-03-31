@@ -9,11 +9,15 @@ skills_list = []
 
 # To get all skills from skill's txt
 for file_name in file_list:
-    with open(path + '/' + file_name, 'r', encoding='utf-8') as f:
 
-        for skill in f.read().split(','):
-            if skill != '':
-                skills_list.append(skill)
+    try:
+        with open(path + '/' + file_name, 'r', encoding='utf-8') as f:
+
+            for skill in f.read().split(','):
+                if skill != '':
+                    skills_list.append(skill)
+    except FileNotFoundError as err:
+        continue
 
 # create a dictionary for skills
 skills_dict = {}

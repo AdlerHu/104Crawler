@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 import json
 import time
 import random
-import MySQLdb
 import os
 import csv
 
@@ -33,7 +32,7 @@ skills = []
 # The variable of work-context dictionary
 work_dict_urls = []
 
-for page in range(1, 31):
+for page in range(1, 51):
     url = 'https://www.104.com.tw/jobs/search/?ro=0&keyword=' \
           + keyword + '&order=15&asc=0&page=' + str(page) + '&mode=s'
 
@@ -57,20 +56,31 @@ for page in range(1, 31):
         res = ss.get(work_dict_url, headers=headers)
         job_content = json.loads(res.text)
 
-        skill_dict = job_content['data']['condition']['specialty']
-        skills_list = []
+        try:
+            skills_list = []
+            job_name = ''
+            salary = ''
+            job_description = ''
+            company_name = ''
+            company_page = ''
+            address = ''
 
-        # from skill dict get skills
-        for skill in skill_dict:
-            skills_list.append(skill['description'])
-            skills.append(skills_list)
+            skill_dict = job_content['data']['condition']['specialty']
 
-        job_name = job_content['data']['header']['jobName']
-        salary = job_content['data']['jobDetail']['salary']
-        job_description = job_content['data']['jobDetail']['jobDescription']
-        company_name = job_content['data']['header']['custName']
-        company_page = job_content['data']['header']['custUrl']
-        address = job_content['data']['jobDetail']['addressRegion'] + job_content['data']['jobDetail']['addressDetail']
+            # from skill dict get skills
+            for skill in skill_dict:
+                skills_list.append(skill['description'])
+                skills.append(skills_list)
+
+            job_name = job_content['data']['header']['jobName']
+            salary = job_content['data']['jobDetail']['salary']
+            job_description = job_content['data']['jobDetail']['jobDescription']
+            company_name = job_content['data']['header']['custName']
+            company_page = job_content['data']['header']['custUrl']
+            address = job_content['data']['jobDetail']['addressRegion'] + job_content['data']['jobDetail']['addressDetail']
+        except Exception as err:
+            print(err.args)
+            continue
 
         print('Done')
 
