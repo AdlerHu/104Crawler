@@ -3,11 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import time
 import random
-import os
-
-path = './jobs/'
-if not os.path.exists(path):
-    os.mkdir(path)
+import MySQLdb
 
 headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -21,26 +17,25 @@ ss = requests.session()
 # The variable of work-context dictionary
 work_dict_urls = []
 
-for page in range(1, 101):
+# The variable of 104 link
+link = ''
+
+for page in range(1, 51):
     url = 'https://www.104.com.tw/jobs/search/?ro=0&keyword=' \
           + keyword + '&order=15&asc=0&page=' + str(page) + '&mode=s'
 
     res = ss.get(url, headers=headers)
     soup = BeautifulSoup(res.text, 'html.parser')
 
-    # A dictionary about information of the vacancy
-    vacancy_dict = {'job_name': '', 'company_name': '', 'salary': '', 'job_description': '',
-                    'company_page': '', 'address': '', 'link': '', 'skills': ''}
-
     # To get the vacancy blocks
-    vacancys = soup.select('div.b-block__left')
+    vacancies = soup.select('div.b-block__left')
 
     # To get the title and url for each vacancy
-    for vacancy in vacancys:
+    for vacancy in vacancies:
 
         tmp_a = vacancy.select('a.js-job-link')
         for a in tmp_a:
-            vacancy_dict['link'] = 'https:' + a['href']
+            link = 'https:' + a['href']
             work_dict_urls.append(work_dict_head + a['href'][21:26])
 
     # get into each work_dict
@@ -50,34 +45,54 @@ for page in range(1, 101):
 
         skills_str = ''
 
+        # A dictionary about information of the vacancy
+        vacancy_dict = {'job_name': '', 'company_name': '', 'salary': '', 'job_description': '',
+                        'company_page': '', 'address': '', 'link': '', 'MS SQL': '0', 'MySQL': '0',
+                        'JavaScript': '0', 'C#': '0', 'HTML': '0', 'ASP.NET': '0', 'Java': '0', 'jQuery': '0',
+                        'Oracle': '0', 'Linux': '0'}
+
         try:
-            skill_dict = job_content['data']['condition']['specialty']
+            skill_list = job_content['data']['condition']['specialty']
 
             # from skill dict get skills
-            for skill in skill_dict:
+            for skill in skill_list:
                 skills_str += skill['description'] + ','
 
+            for skills in skills_str.split(','):
+                if skills in vacancy_dict:
+                    vacancy_dict[skills] = '1'
+
             vacancy_dict['job_name'] = job_content['data']['header']['jobName']
+            vacancy_dict['company_name'] = job_content['data']['header']['custName']
             vacancy_dict['salary'] = job_content['data']['jobDetail']['salary']
             vacancy_dict['job_description'] = job_content['data']['jobDetail']['jobDescription']
-            vacancy_dict['company_name'] = job_content['data']['header']['custName']
             vacancy_dict['company_page'] = job_content['data']['header']['custUrl']
-            vacancy_dict['address'] = job_content['data']['jobDetail']['addressRegion'] +\
+            vacancy_dict['address'] = job_content['data']['jobDetail']['addressRegion'] + \
                                       job_content['data']['jobDetail']['addressDetail']
-            vacancy_dict['skills'] = skills_str
+            vacancy_dict['link'] = link
 
         except Exception as err:
             print(err.args)
             continue
 
-        print('Done')
+        # Connect the database
+        db = MySQLdb.connect(host='localhost', user='root', passwd='root', db='py104', port=3306, charset='utf8')
+        cursor = db.cursor()
+        db.autocommit(True)
 
         try:
-            with open(path + vacancy_dict['company_name'] + '-' + vacancy_dict['job_name'] + '.txt', 'w',
-                      encoding='utf-8') as f:
-                for key in vacancy_dict:
-                    f.writelines(vacancy_dict[key] + '\n')
-
+            sql_str = "INSERT INTO `job` (`job_name`, `company_name`, `salary`," \
+                      " `job_description`, `company_page`, `address`, `link`, `MS_SQL`, `MySQL`," \
+                      " `JavaScript`, `C_sharp`, `HTML`, `ASPNET`, `Java`, `jQuery`, `Oracle`, `Linux`)" \
+                      " VALUES(\'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', " \
+                      "\'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\'); " \
+                .format(vacancy_dict['job_name'], vacancy_dict['company_name'], vacancy_dict['salary'],
+                        vacancy_dict['job_description'], vacancy_dict['company_page'], vacancy_dict['address'],
+                        vacancy_dict['link'], vacancy_dict['MS SQL'], vacancy_dict['MySQL'], vacancy_dict['JavaScript'],
+                        vacancy_dict['C#'], vacancy_dict['HTML'], vacancy_dict['ASP.NET'], vacancy_dict['Java'],
+                        vacancy_dict['jQuery'], vacancy_dict['Oracle'], vacancy_dict['Linux'], )
+            cursor.execute(sql_str)
+            print('Done')
         except Exception as err:
             print(err.args)
 
