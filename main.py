@@ -12,6 +12,11 @@ headers = {
 keyword = '資料庫'
 work_dict_head = 'https://www.104.com.tw/job/ajax/content/'
 
+# Connect the database
+db = MySQLdb.connect(host='localhost', user='root', passwd='root', db='py104', port=3306, charset='utf8')
+cursor = db.cursor()
+db.autocommit(True)
+
 ss = requests.session()
 
 # The variable of work-context dictionary
@@ -20,7 +25,7 @@ work_dict_urls = []
 # The variable of 104 link
 link = ''
 
-for page in range(1, 51):
+for page in range(1, 101):
     url = 'https://www.104.com.tw/jobs/search/?ro=0&keyword=' \
           + keyword + '&order=15&asc=0&page=' + str(page) + '&mode=s'
 
@@ -74,11 +79,6 @@ for page in range(1, 51):
         except Exception as err:
             print(err.args)
             continue
-
-        # Connect the database
-        db = MySQLdb.connect(host='localhost', user='root', passwd='root', db='py104', port=3306, charset='utf8')
-        cursor = db.cursor()
-        db.autocommit(True)
 
         try:
             sql_str = "INSERT INTO `job` (`job_name`, `company_name`, `salary`," \
