@@ -90,7 +90,7 @@ for page in range(1, 101):
                         vacancy_dict['job_description'], vacancy_dict['company_page'], vacancy_dict['address'],
                         vacancy_dict['link'], vacancy_dict['MS SQL'], vacancy_dict['MySQL'], vacancy_dict['JavaScript'],
                         vacancy_dict['C#'], vacancy_dict['HTML'], vacancy_dict['ASP.NET'], vacancy_dict['Java'],
-                        vacancy_dict['jQuery'], vacancy_dict['Oracle'], vacancy_dict['Linux'], )
+                        vacancy_dict['jQuery'], vacancy_dict['Oracle'], vacancy_dict['Linux'])
             cursor.execute(sql_str)
             print('Done')
         except Exception as err:
