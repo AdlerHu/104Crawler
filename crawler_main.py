@@ -19,13 +19,14 @@ db.autocommit(True)
 
 ss = requests.session()
 
-# The variable of work-context dictionary
-work_dict_urls = []
-
 # The variable of 104 link
 link = ''
 
 for page in range(1, 101):
+
+    # The variable of work-context dictionary
+    work_dict_urls = []
+
     url = 'https://www.104.com.tw/jobs/search/?ro=0&keyword=' \
           + keyword + '&order=15&asc=0&page=' + str(page) + '&mode=s'
 
