@@ -13,7 +13,7 @@ keyword = '資料庫'
 work_dict_head = 'https://www.104.com.tw/job/ajax/content/'
 
 # Connect the database
-db = MySQLdb.connect(host='localhost', user='root', passwd='root', db='py104', port=3306, charset='utf8')
+db = MySQLdb.connect(host=host, user='root', passwd=passwd, db='py104', port=3306, charset='utf8')
 cursor = db.cursor()
 db.autocommit(True)
 
